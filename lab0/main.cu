@@ -17,14 +17,9 @@ __global__ void SomeTransform(char *input_gpu, int fsize) {
 	int idx = blockIdx.x * blockDim.x + threadIdx.x;
 	if (idx < fsize && input_gpu[idx] != '\n' && input_gpu[idx] != ',' &&
 		input_gpu[idx] != '.') {
-		//if(idx == 37)
-		//	printf("AAAAAAAAAA %c\n", input_gpu[idx]);
 		int asciiChar = int(input_gpu[idx]);
 		if((asciiChar >= 97 && asciiChar <= 122))
 			input_gpu[idx] = char(asciiChar - 32);
-		//if((asciiChar >= 97 && asciiChar <= 122) || 
-		//	(asciiChar >= 65 && asciiChar <= 90))
-		//	if((idx+1) % 2 == 0)
 	}
 }
 
@@ -44,7 +39,6 @@ int main(int argc, char **argv)
 	fseek(fp, 0, SEEK_END);
 	size_t fsize = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
-	//cout << "fsize: " << fsize << endl;
 
 	// read files
 	MemoryBuffer<char> text(fsize+1);
@@ -61,7 +55,6 @@ int main(int argc, char **argv)
 	// And don't transform the line breaks
 	int nThreads = 32;
 	int nBlocks = fsize/nThreads + ((fsize % nThreads == 0) ? 0 : 1);
-	// cout << "nBlocks: " << nBlocks << endl;
 	SomeTransform<<<nBlocks, nThreads>>>(input_gpu, fsize);
 
 	puts(text_smem.get_cpu_ro());
